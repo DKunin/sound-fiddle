@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    // set up audio context
+var audioContext = (window.AudioContext || window.webkitAudioContext);
+// create audio class
+if (audioContext) {
+  // Web Audio API is available.
+  var audioAPI = new audioContext();
+} else {
+  // Web Audio API is not available. Ask the user to use a supported browser.
+  alert("Oh nos! It appears your browser does not support the Web Audio API, please upgrade or use a different browser");
+}
+
+// variables
+var analyserNode,
+    frequencyData = new Uint8Array(20),
+    newFreqData,
+    animateDom = function() {
+        console.log(frequencyData);
+    };
+    
+
+// create an audio API analyser node and connect to source
+function createAnalyserNode(audioSource) {
+  analyserNode = audioAPI.createAnalyser();
+  analyserNode.fftSize = 8192;
+  audioSource.connect(analyserNode);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  analyserNode.getByteFrequencyData(frequencyData);
+  newFreqData = adjustFreqData();
+  // frequencyData.forEach(newData);
+  animateDom();
+}
+
+var shapeCount = 32;
+
+function adjustFreqData() {
+  analyserNode.getByteFrequencyData(frequencyData);
+  var removed = frequencyData.slice(0,1024);
+  
+  var newFreqs = [], prevRangeStart = 0, prevItemCount = 0;
+
+  // set up the maxPow & thus ratio based on shapeCount
+  var maxPow = Math.pow(2,shapeCount/2);
+  var ratio = 1024/maxPow;
+  
+  // looping - get values for new array based on shapeCount
+  for (let j=1; j<shapeCount+1; j++) {
+    var itemCount, rangeStart;
+
+    var pow = j/2;
+
+    // use ratio to get itemCount (round)
+    itemCount = Math.ceil( ((Math.pow(2, pow))*ratio)/2 );
+
+    rangeStart = prevRangeStart + Math.ceil(prevItemCount/2);
+     // get new values
+    var newValue = 0, total = 0;
+    for (let k=rangeStart; k<rangeStart+itemCount; k++) {
+      // add up items and divide by total
+      total += frequencyData[k];
+      newValue = parseInt(total/itemCount);
+    }
+    // add to new array
+    newFreqs.push(newValue);
+
+    prevItemCount = itemCount;
+    prevRangeStart = rangeStart;
+  }
+  
+  return newFreqs;
+}
+
+// getUserMedia success callback -> pipe audio stream into audio API
+var gotStream = function(stream) {
+  // Create an audio input from the stream.
+  var audioSource = audioAPI.createMediaStreamSource(stream);
+  createAnalyserNode(audioSource);
+  animate();
+}
+// getUserMedia success callback -> pipe audio stream into audio API
+var gotMedia = function(stream) {
+  // Create an audio input from the stream.
+  var audioSource = audioAPI.createMediaElementSource(stream);
+  createAnalyserNode(audioSource);
+  animate();
+}
+
+// pipe in analysing to getUserMedia
+// navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+//   .then(gotStream);
+gotMedia(document.querySelector('video').cloneNode());
+</script>
+</html>
