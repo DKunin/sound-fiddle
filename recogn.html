@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new speechRecognition();
+
+recognition.lang = 'ru-RU';
+recognition.interimResults = false;
+recognition.maxAlternatives = 1;
+recognition.continuous = true;
+recognition.onresult = event => {
+  // document.querySelector('.js-abuse-btn').click();
+  const latest = Object.keys(event.results).reduce((singleKey, newItem) => {
+    console.log(singleKey);
+    return event.results[singleKey];
+  }, {});
+  console.log(latest, event.results);
+
+};
+recognition.onerror = error => console.log(error);
+
+recognition.start();
+
+
+</script>
+</html>
