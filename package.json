@@ -1,0 +1,30 @@
+{
+  "name": "sound-fiddle",
+  "version": "0.0.1",
+  "private": false,
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dkunin/sound-fiddle.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dkunin/sound-fiddle/issues"
+  },
+  "scripts": {
+    "test": "echo test",
+    "start": "node ./",
+    "dev": "node ./",
+    "build": "browserify dat-stuff.js -o bundle.js"
+  },
+  "homepage": "https://github.com/dkunin/sound-fiddle",
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "browserify": "14.4.0",
+    "concat-stream": "1.6.0",
+    "dat-js": "6.2.0",
+    "dat-node": "3.5.3",
+    "hyperdiscovery": "6.0.4",
+    "hyperdrive": "9.5.2"
+  }
+}
